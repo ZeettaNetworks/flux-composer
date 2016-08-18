@@ -1,0 +1,26 @@
+{
+  "name": "compositional-flux",
+  "version": "0.0.1",
+  "description": "A Flux implementation using the composition paradigm.",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start"
+  },
+  "keywords": [
+    "flux"
+  ],
+  "author": "Luke Murray",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.0",
+    "jasmine": "^2.4.1",
+    "karma": "^1.2.0",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-browserify": "^5.1.0",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "watchify": "^3.7.0"
+  }
+}
