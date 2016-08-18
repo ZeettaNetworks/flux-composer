@@ -91,4 +91,95 @@ describe("dispatch()", () => {
             dispatcher.dispatch();
         }).toThrowError();
     });
+
+
+});
+
+describe("waitFor()", () => {
+    it("waits for all specified stores", () => {
+        const updateOrder = [];
+        const store1 = {
+            name: "1",
+            notify: () => {
+                updateOrder.push("1")
+            }
+        };
+        const store2 = {
+            name: "2",
+            notify: () => {
+                dispatcher.waitFor("1", "3");
+                updateOrder.push("2");
+            }
+        };
+        const store3 = {
+            name: "3",
+            notify: () => {
+                updateOrder.push("3");
+            }
+        };
+
+        dispatcher.addStore(store1);
+        dispatcher.addStore(store2);
+        dispatcher.addStore(store3);
+
+        expect(() => {
+            dispatcher.dispatch();
+        }).not.toThrowError();
+        expect(updateOrder).toEqual(["1", "3", "2"]);
+    });
+
+    it("doesn't cause a store to be updated twice", () => {
+        const STORE_TO_WAIT_FOR = "store to wait for";
+        const STORE_THAT_WAITS = "store that waits";
+        const updateOrder = [];
+        const storeToWaitFor = {
+            name: STORE_TO_WAIT_FOR,
+            notify: () => {
+                updateOrder.push(STORE_TO_WAIT_FOR)
+            }
+        };
+        const storeThatWaits = {
+            name: STORE_THAT_WAITS,
+            notify: () => {
+                dispatcher.waitFor(STORE_TO_WAIT_FOR);
+                updateOrder.push(STORE_THAT_WAITS);
+            }
+        };
+
+        spyOn(storeToWaitFor, "notify");
+        spyOn(storeThatWaits, "notify");
+        dispatcher.addStore(storeThatWaits);
+        dispatcher.addStore(storeToWaitFor);
+
+        expect(() => {
+            dispatcher.dispatch();
+        }).not.toThrowError();
+        expect(storeToWaitFor.notify.calls.count()).toEqual(1);
+        expect(storeThatWaits.notify.calls.count()).toEqual(1);
+        expect(updateOrder).toEqual([STORE_TO_WAIT_FOR, STORE_THAT_WAITS]);
+    });
+
+    it("throws an error if it would cause a cyclic wait", () => {
+        const store1 = {
+            name: "1",
+            notify: () => {
+                dispatcher.waitFor("2");
+                updateOrder.push("1")
+            }
+        };
+        const store2 = {
+            name: "2",
+            notify: () => {
+                dispatcher.waitFor("1");
+                updateOrder.push("2");
+            }
+        };
+
+        dispatcher.addStore(store1);
+        dispatcher.addStore(store2);
+
+        expect(() => {
+            dispatcher.dispatch();
+        }).toThrowError();
+    });
 });
