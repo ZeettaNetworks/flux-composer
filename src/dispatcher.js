@@ -22,6 +22,7 @@ export function createDispatcher() {
 
     // Dispatch state
     // This is shared between functions responsible for managing action dispatch
+    let dispatchInProgress = false;
     let actionBeingDispatched = null;
     let storeUpdateStatuses = null;
 
@@ -30,11 +31,12 @@ export function createDispatcher() {
      * @param action The action to dispatch to the stores.
      */
     function dispatch(action) {
-        if(actionBeingDispatched !== null) {
+        if(dispatchInProgress) {
             throw new Error("[dispatcher.dispatch] The dispatcher cannot dispatch an action whilst dispatching another action.")
         }
 
         // Set up dispatch state
+        dispatchInProgress = true;
         actionBeingDispatched = action;
         storeUpdateStatuses = {};
         for(const name of Object.keys(stores)) {
@@ -55,6 +57,7 @@ export function createDispatcher() {
         }
 
         // Tear down dispatch state
+        dispatchInProgress = false;
         actionBeingDispatched = null;
         storeUpdateStatuses = null;
     }
@@ -65,7 +68,7 @@ export function createDispatcher() {
      * @param storesToWaitFor Names of stores to update (given as separate parameters)
      */
     function waitFor(...storesToWaitFor) {
-        if(actionBeingDispatched === null) {
+        if(!dispatchInProgress) {
             throw new Error("[dispatcher.waitFor] The dispatcher cannot wait for another store when it is not dispatching an action.");
         }
         for(const name of storesToWaitFor) {
