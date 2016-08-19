@@ -199,4 +199,19 @@ describe("waitFor()", () => {
             dispatcher.dispatch();
         }).toThrowError();
     });
+
+    it("throws an error if asked to wait for a non-existent store", () => {
+        const store1 = {
+            name: "1",
+            notify: () => {
+                dispatcher.waitFor("2");
+            }
+        };
+
+        dispatcher.addStore(store1);
+
+        expect(() => {
+            dispatcher.dispatch();
+        }).toThrowError();
+    })
 });
