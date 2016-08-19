@@ -1,13 +1,26 @@
-import dispatcher from "../src/dispatcher";
+import dispatcher, {createDispatcher} from "../src/dispatcher";
 
-function doNothing() {
-}
+describe("dispatcher singleton", () => {
+    it("is an object", () => {
+        expect(dispatcher).toEqual(jasmine.any(Object));
+    });
+});
 
 describe("addStore()", () => {
+    let dispatcher;
+
+    function doNothing() {
+    }
+
+    beforeEach(() => {
+        dispatcher = createDispatcher();
+    });
+
     it("adds a store that is correctly formed", () => {
         const store = {
             name  : "test store",
             notify: doNothing
+
         };
 
         expect(() => {
@@ -59,6 +72,12 @@ describe("addStore()", () => {
 });
 
 describe("dispatch()", () => {
+    let dispatcher;
+
+    beforeEach(() => {
+        dispatcher = createDispatcher();
+    });
+
     it("calls the notify method of every store added", () => {
         const store1Notify = jasmine.createSpy("store 1 notify()");
         const store2Notify = jasmine.createSpy("store 2 notify()");
@@ -96,6 +115,12 @@ describe("dispatch()", () => {
 });
 
 describe("waitFor()", () => {
+    let dispatcher;
+
+    beforeEach(() => {
+        dispatcher = createDispatcher();
+    });
+
     it("waits for all specified stores", () => {
         const updateOrder = [];
         const store1 = {
