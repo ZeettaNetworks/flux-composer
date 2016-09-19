@@ -16,15 +16,15 @@ import dispatcher from "<path>/dispatcher"
 
 ### `dispatcher.addStore(store)` ###
 
-Adds a store to the dispatcher. The store will receive any action dispatched. `store` is any object that has the `name` property as a string and the `notify` property as a function.
+Adds a store to the dispatcher. The store will receive any action dispatched. `store` is any object that has the `name` property as a string and the `handleAction` property as a function.
 
 ### `dispatcher.dispatch(action)` ###
 
-Dispatches an action to all stores synchronously. An action can be anything you like but is usually an object. The stores will receive actions through their notify methods.
+Dispatches an action to all stores synchronously. An action can be anything you like but is usually an object. The stores will receive actions through their `handleAction` methods.
 
 ### `dispatcher.waitFor(...stores)` ###
 
-Waits for the stores with the given names to be updated before returning. Give each store name as a separate parameter. This method must only be used within a store as it is being notified.
+Waits for the stores with the given names to be updated before returning. Give each store name as a separate parameter. This method must only be used within a store as it is being dispatched to.
 
 ## Notifier ##
 
