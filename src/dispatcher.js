@@ -26,16 +26,7 @@ export function createDispatcher() {
     let actionBeingDispatched = null;
     let storeUpdateStatuses = null;
 
-    /**
-     * Dispatch an action to all stores registered with the dispatcher.
-     * @param action The action to dispatch to the stores.
-     */
-    function dispatch(action) {
-        if(dispatchInProgress) {
-            throw new Error("[dispatcher.dispatch] The dispatcher cannot dispatch an action whilst dispatching another action.")
-        }
-
-        // Set up dispatch state
+    function setupDispatchState(action) {
         dispatchInProgress = true;
         actionBeingDispatched = action;
         storeUpdateStatuses = {};
@@ -45,6 +36,24 @@ export function createDispatcher() {
                 completed: false
             }
         }
+    }
+
+    function tearDownDispatchState() {
+        dispatchInProgress = false;
+        actionBeingDispatched = null;
+        storeUpdateStatuses = null;
+    }
+
+    /**
+     * Dispatch an action to all stores registered with the dispatcher.
+     * @param action The action to dispatch to the stores.
+     */
+    function dispatch(action) {
+        if(dispatchInProgress) {
+            throw new Error("[dispatcher.dispatch] The dispatcher cannot dispatch an action whilst dispatching another action.")
+        }
+
+        setupDispatchState(action);
 
         // Notify all stores.
         for(const name of Object.keys(stores)) {
@@ -52,14 +61,16 @@ export function createDispatcher() {
             const storeUpdateStatus = storeUpdateStatuses[name];
 
             if(!storeUpdateStatus.completed) {
-                updateStore(store, storeUpdateStatus, actionBeingDispatched);
+                try {
+                    updateStore(store, storeUpdateStatus, actionBeingDispatched);
+                } catch(e) {
+                    tearDownDispatchState(); // Ensures that the dispatcher knows that there is no longer a dispatch in progress.
+                    throw(e);
+                }
             }
         }
 
-        // Tear down dispatch state
-        dispatchInProgress = false;
-        actionBeingDispatched = null;
-        storeUpdateStatuses = null;
+        tearDownDispatchState();
     }
 
     /**

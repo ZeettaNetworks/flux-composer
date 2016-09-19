@@ -111,7 +111,36 @@ describe("dispatch()", () => {
         }).toThrowError();
     });
 
+    it("tears down dispatch state when an error is thrown by a store", () => {
+        dispatcher.addStore({
+            name: "throws an error on notify",
+            notify: function notify() {
+                throw new Error("test error");
+            }
+        });
 
+        expect(() => {
+            dispatcher.dispatch();
+        }).toThrowError();
+    });
+
+    it("doesn't throw an error on unrelated dispatches subsequent to a dispatch that had an error thrown", () => {
+        dispatcher.addStore({
+            name: "throws an error on action 1",
+            notify(action) {
+                if(action.action === "throw error") {
+                    throw new Error("test error");
+                }
+            }
+        });
+
+        expect(() => {
+            dispatcher.dispatch({action: "throw error"});
+        }).toThrowError();
+        expect(() => {
+            dispatcher.dispatch({action: "don't throw error"});
+        }).not.toThrowError();
+    });
 });
 
 describe("waitFor()", () => {
