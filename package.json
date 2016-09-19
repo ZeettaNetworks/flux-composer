@@ -1,6 +1,6 @@
 {
   "name": "flux-composer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Flux implementation using the composition paradigm.",
   "main": "index.js",
   "scripts": {
