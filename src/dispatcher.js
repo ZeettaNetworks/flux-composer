@@ -5,7 +5,7 @@ export function createDispatcher() {
      * Registers a store with the dispatcher so that it is notified about any actions.
      * @param {Object} store
      * @param {String} store.name The name of this store
-     * @param {Function} store.notify The function that will be called when the dispatcher dispatches an action to this store.
+     * @param {Function} store.handleAction The function that will be called when the dispatcher dispatches an action to this store.
      */
     function addStore(store) {
         if(typeof store.name !== "string" || store.name.length === 0) {
@@ -14,8 +14,8 @@ export function createDispatcher() {
         if(stores.hasOwnProperty(store.name)) {
             throw new Error(`[dispatcher.addStore] The dispatcher has already registered a store named "${store.name}"`);
         }
-        if(typeof store.notify !== "function") {
-            throw new Error("[dispatcher.addStore] Expected store \"notify\" property to be a method");
+        if(typeof store.handleAction !== "function") {
+            throw new Error("[dispatcher.addStore] Expected store \"handleAction\" property to be a method");
         }
         stores[store.name] = store;
     }
@@ -103,7 +103,7 @@ export function createDispatcher() {
 
     function updateStore(store, status, action) {
         status.started = true;
-        store.notify(action);
+        store.handleAction(action);
         status.completed = true;
     }
 

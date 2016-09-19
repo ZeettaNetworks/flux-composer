@@ -19,7 +19,7 @@ describe("addStore()", () => {
     it("adds a store that is correctly formed", () => {
         const store = {
             name  : "test store",
-            notify: doNothing
+            handleAction: doNothing
 
         };
 
@@ -30,7 +30,7 @@ describe("addStore()", () => {
 
     it("throws an error if the store has no name", () => {
         const store = {
-            notify: doNothing
+            handleAction: doNothing
         };
 
         expect(() => {
@@ -41,7 +41,7 @@ describe("addStore()", () => {
     it("throws an error if the store's name is empty", () => {
         const store = {
             name  : "",
-            notify: doNothing
+            handleAction: doNothing
         };
 
         expect(() => {
@@ -49,7 +49,7 @@ describe("addStore()", () => {
         }).toThrowError();
     });
 
-    it("throws an error if the store has no notify function", () => {
+    it("throws an error if the store has no handleAction function", () => {
         const store = {
             name: "test store"
         };
@@ -59,10 +59,10 @@ describe("addStore()", () => {
         }).toThrowError();
     });
 
-    it("throws an error if the store's notify property is not a function", () => {
+    it("throws an error if the store's handleAction property is not a function", () => {
         const store = {
             name  : "test store",
-            notify: "a string"
+            handleAction: "a string"
         };
 
         expect(() => {
@@ -78,30 +78,30 @@ describe("dispatch()", () => {
         dispatcher = createDispatcher();
     });
 
-    it("calls the notify method of every store added", () => {
-        const store1Notify = jasmine.createSpy("store 1 notify()");
-        const store2Notify = jasmine.createSpy("store 2 notify()");
+    it("calls the handleAction method of every store added", () => {
+        const store1HandleAction = jasmine.createSpy("store 1 handleAction()");
+        const store2HandleAction = jasmine.createSpy("store 2 handleAction()");
 
         dispatcher.addStore({
             name  : "store 1",
-            notify: store1Notify
+            handleAction: store1HandleAction
         });
         dispatcher.addStore({
             name  : "store 2",
-            notify: store2Notify
+            handleAction: store2HandleAction
         });
 
         expect(() => {
             dispatcher.dispatch()
         }).not.toThrowError();
-        expect(store1Notify.calls.count()).toEqual(1);
-        expect(store2Notify.calls.count()).toEqual(1);
+        expect(store1HandleAction.calls.count()).toEqual(1);
+        expect(store2HandleAction.calls.count()).toEqual(1);
     });
 
     it("throws an error if asked to dispatch another action whilst dispatching", () => {
         dispatcher.addStore({
-            name: "dispatches on notify",
-            notify: function notify() {
+            name: "dispatches on handleAction",
+            handleAction() {
                 dispatcher.dispatch();
             }
         });
@@ -113,8 +113,8 @@ describe("dispatch()", () => {
 
     it("tears down dispatch state when an error is thrown by a store", () => {
         dispatcher.addStore({
-            name: "throws an error on notify",
-            notify: function notify() {
+            name: "throws an error on handleAction",
+            handleAction() {
                 throw new Error("test error");
             }
         });
@@ -127,7 +127,7 @@ describe("dispatch()", () => {
     it("doesn't throw an error on unrelated dispatches subsequent to a dispatch that had an error thrown", () => {
         dispatcher.addStore({
             name: "throws an error on action 1",
-            notify(action) {
+            handleAction(action) {
                 if(action.action === "throw error") {
                     throw new Error("test error");
                 }
@@ -154,20 +154,20 @@ describe("waitFor()", () => {
         const updateOrder = [];
         const store1 = {
             name: "1",
-            notify: () => {
+            handleAction() {
                 updateOrder.push("1")
             }
         };
         const store2 = {
             name: "2",
-            notify: () => {
+            handleAction() {
                 dispatcher.waitFor("1", "3");
                 updateOrder.push("2");
             }
         };
         const store3 = {
             name: "3",
-            notify: () => {
+            handleAction() {
                 updateOrder.push("3");
             }
         };
@@ -187,11 +187,11 @@ describe("waitFor()", () => {
         const spy2 = jasmine.createSpy();
         const store1 = {
             name: "1",
-            notify: spy1
+            handleAction: spy1
         };
         const store2 = {
             name: "2",
-            notify: () => {
+            handleAction() {
                 dispatcher.waitFor("1");
                 spy2();
             }
@@ -210,13 +210,13 @@ describe("waitFor()", () => {
     it("throws an error if it would cause a cyclic wait", () => {
         const store1 = {
             name: "1",
-            notify: () => {
+            handleAction() {
                 dispatcher.waitFor("2");
             }
         };
         const store2 = {
             name: "2",
-            notify: () => {
+            handleAction() {
                 dispatcher.waitFor("1");
             }
         };
@@ -232,7 +232,7 @@ describe("waitFor()", () => {
     it("throws an error if asked to wait for a non-existent store", () => {
         const store1 = {
             name: "1",
-            notify: () => {
+            handleAction() {
                 dispatcher.waitFor("2");
             }
         };
