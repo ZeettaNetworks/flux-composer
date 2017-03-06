@@ -1,4 +1,4 @@
-import createNotifier from "../src/notifier";
+import createNotifier from "../lib/notifier";
 
 describe("listen()", () => {
     let notifier;

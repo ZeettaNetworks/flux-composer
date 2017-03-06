@@ -1,4 +1,4 @@
-import dispatcher, {createDispatcher} from "../src/dispatcher";
+import dispatcher, {createDispatcher} from "../lib/dispatcher";
 
 describe("dispatcher singleton", () => {
     it("is an object", () => {

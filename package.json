@@ -24,6 +24,7 @@
     "watchify": "^3.7.0"
   },
   "directories": {
+    "lib": "lib",
     "test": "test"
   },
   "dependencies": {},
