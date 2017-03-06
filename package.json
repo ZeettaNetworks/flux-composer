@@ -22,5 +22,17 @@
     "karma-chrome-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "watchify": "^3.7.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZeettaNetworks/flux-composer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ZeettaNetworks/flux-composer/issues"
+  },
+  "homepage": "https://github.com/ZeettaNetworks/flux-composer#readme"
 }
