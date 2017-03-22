@@ -45,6 +45,60 @@ Registers a listener to a named event. This method should be composed with your 
 
 Calls all listeners subscribed to the given event name. If there are no listeners to the event then this function does nothing. This method should be used privately within your store.
 
+### `notifier.unlisten(eventName, func)` ###
+
+Unregisters a listener from a named event. This method is the opposite of `listen()`. A listener that has been unregistered from a named event will no longer be called by `notify()` for that event name. If the listener is listening for any other events from this notifier, those will be unaffected. This method should be composed with your store's public API.
+
+## Flag Notifier ##
+
+This module is used to create notifiers which register listeners against names and then calls those listeners according to a flag-raising model. A name can be flagged by this notifier and later listeners will be fired for all flagged names at once. Raising a flag multiple times will not cause a listener to be called multiple times, only once when the notifications are all dispatched together.
+
+```js
+import createFlagNotifier from "<path>/flag-notifier";
+
+const flagNotifier = createFlagNotifier();
+```
+
+### `flagNotifier.listen(flagName, func)` ###
+
+Registers a listener to a named flag. This method should be composed with your store's public API so that views can update themselves. Listeners are passed no data when notified, views should instead retrieve data from the store via other public API methods.
+
+### `flagNotifier.flag(flagName)` ###
+
+Raises a named flag. Raising the same named flag more than once has no effect.
+
+### `flagNotifier.notify()` ###
+
+Calls all the listeners of all of the raised flags. All raised flags are then lowered.
+
+### `flagNotifier.unlisten(flagName, func)` ###
+
+Unregisters a listener from a named flag. This method is the opposite of `listen()`. A listener that has been unregistered from a flag name will no longer be called by `notify()` for that flag name. If the listener is listening for any other flags from this notifier, those will be unaffected. This method should be composed with your store's public API.
+
+### Examples ###
+
+```js
+flagNotifier.listen("example", listener);
+flagNotifier.notify(); // Listener isn't called, the "example" flag has not been raised.
+```
+```js
+flagNotifier.listen("example", listener);
+flagNotifier.flag("example");
+flagNotifier.notify(); // Listener is called once
+```
+```js
+flagNotifier.listen("example", listener);
+flagNotifier.flag("example");
+flagNotifier.flag("example");
+flagNotifier.notify(); // Listener is still only called once
+```
+```js
+flagNotifier.listen("example", listener);
+flagNotifier.flag("example");
+flagNotifier.notify(); // Listener is called here.
+flagNotifier.notify(); // The listener isn't called here because the previous notify lowered all flags.
+```
+
 ## Optimism ##
 
 This module is used to handle optimistic updates to store state. This implementation uses a base state (the state of the store before any optimistic action is applied) and an array of actions (some of which are optimistic) that are applied in sequence to the base state to obtain the optimistic state. 
