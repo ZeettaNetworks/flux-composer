@@ -38,9 +38,6 @@ describe("listen()", () => {
 describe("notify()", () => {
     let notifier;
 
-    function doNothing() {
-    }
-
     beforeEach(() => {
         notifier = createNotifier();
     });
@@ -72,5 +69,51 @@ describe("notify()", () => {
             notifier.notify("test 2");
         }).not.toThrowError();
         expect(spy2).toHaveBeenCalled();
+    });
+});
+
+describe("unlisten()", () => {
+    let notifier;
+
+    function doNothing() {
+    }
+
+    beforeEach(() => {
+        notifier = createNotifier();
+    });
+
+    it("unregisters a listener given the correct parameters", () => {
+        notifier.listen("test", doNothing);
+        expect(() => {
+            notifier.unlisten("test", doNothing);
+        }).not.toThrowError();
+    });
+
+    it("throws an error if not given an event name string", () => {
+        expect(() => {
+            notifier.unlisten();
+        }).toThrowError();
+    });
+
+    it("throws an error if the event name string is empty", () => {
+        expect(() => {
+            notifier.unlisten("", () => {});
+        }).toThrowError();
+    });
+
+    it("throws an error if not given a listener function", () => {
+        expect(() => {
+            notifier.unlisten("test");
+        }).toThrowError();
+    });
+
+    it("stops a function from being called by notify()", () => {
+        const spy = jasmine.createSpy("listener");
+        notifier.listen("test", spy);
+        notifier.notify("test");
+        expect(spy.calls.count()).toEqual(1);
+        notifier.unlisten("test", spy);
+        notifier.notify("test");
+        expect(spy.calls.count()).toEqual(1);
     });
 });
